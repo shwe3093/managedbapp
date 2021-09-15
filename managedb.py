@@ -1,8 +1,12 @@
 from flask import Flask, request, jsonify, render_template
 from flask_sqlalchemy import SQLAlchemy
+import os
+
+userinfo_admin_password = os.environ["userinfo_admin_password"]
+rds_uri_code = os.environ["rds_uri_code"]
 
 app = Flask(__name__)
-app.config["SQLALCHEMY_DATABASE_URI"] = "mysqlurl"
+app.config["SQLALCHEMY_DATABASE_URI"] = "mysql://admin:{}@database-{}.us-west-2.rds.amazonaws.com:3306/UserInfo".format(userinfo_admin_password,rds_uri_code)
 db = SQLAlchemy(app)
 
 class User(db.Model):
