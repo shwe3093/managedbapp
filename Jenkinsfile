@@ -12,7 +12,7 @@ pipeline {
 			sudo -i -u ec2-user aws ssm get-parameter --name rds_uri_code --region us-west-2 --with-decryption | jq '."Parameter"."Value"'>> rds_uri_code.txt
 			export rds_uri_code=$(cat rds_uri_code.txt)
 			export label="$(date +"%a%m%d%H%M")"
-			sudo docker build --tag managedb-registry:$label
+			sudo docker build --tag managedb-registry:$label .
 			sudo docker tag managedb-registry:$label ${account_id}.dkr.ecr.us-west-2.amazonaws.com/managedb-registry:$label
 			sudo docker push ${account_id}.dkr.ecr.us-west-2.amazonaws.com/managedb-registry:$label 		
 		'''
