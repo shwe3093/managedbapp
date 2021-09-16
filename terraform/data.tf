@@ -62,30 +62,4 @@ data "aws_ami" "latest_ecs_ami" {
 }
 
 
-data "aws_vpc" "testvpc" {
-  id = var.vpc_id
-
-  filter {
-    name = "Name"
-    values = ["testvpc"]
-  }
-}
-
-data "aws_subnet" "public-subnet" {
-  id = var.subnet_id
-
-  filter {
-    name = "Name"
-    values = ["public-subnet"]
-  }
-}
-
-data "aws_subnet" "private-subnet" {
-  id = var.subnet_id
-
-  filter {
-    name = "Name"
-    values = ["private-subnet"]
-  }
-}
 

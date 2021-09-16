@@ -1,6 +1,6 @@
 ## IAM Policies and Roles ##
 locals {
-  account_id = "${data.aws_caller_identity.current.account_id}"
+  account_id = data.aws_caller_identity.current.account_id
 }
 
 resource "aws_iam_role" "ecs_service_role" {
@@ -80,10 +80,10 @@ resource "aws_iam_role" "ec2_role" {
             "dynamodb:UpdateItem",
             "dynamodb:DeleteItem"
           ]
-          Effect   = "Allow"
+          Effect = "Allow"
           Resource = [
-            "arn:aws:logs:us-east-1:${local.account_id}:*/*",
-            "arn:aws:dynamodb:us-east-1:${local.account_id}:*/*"
+            "arn:aws:logs:us-west-2:${local.account_id}:*/*",
+            "arn:aws:dynamodb:us-west-2:${local.account_id}:*/*"
           ]
         }
       ]
@@ -130,10 +130,10 @@ resource "aws_iam_role" "autoscaling_role" {
             "cloudwatch:DescribeAlarms",
             "cloudwatch:DeleteAlarms"
           ]
-          Effect   = "Allow"
+          Effect = "Allow"
           Resource = [
-            "arn:aws:ecs:us-east-1:${local.account_id}:*/*",
-            "arn:aws:cloudwatch:us-east-1:${local.account_id}:*/*"
+            "arn:aws:ecs:us-west-2:${local.account_id}:*/*",
+            "arn:aws:cloudwatch:us-west-2:${local.account_id}:*/*"
           ]
         }
       ]
@@ -146,7 +146,7 @@ resource "aws_iam_role" "autoscaling_role" {
 resource "aws_security_group" "ecs_sg" {
   name        = "ecs-sg"
   description = "ECS security group for the ALB."
-  vpc_id      = data.aws_vpc.testvpc.id
+  vpc_id      = "${var.vpc_id}"
 
   ingress {
     protocol    = "tcp"
@@ -198,7 +198,7 @@ resource "aws_ecs_task_definition" "ecs_task_definition" {
       "logDriver": "awslogs",
       "options": {
         "awslogs-group": "ecs-logs",
-        "awslogs-region": "us-east-1",
+        "awslogs-region": "us-west-2",
         "awslogs-stream-prefix": "ecs-demo-app"
       }
     },
@@ -227,7 +227,7 @@ resource "aws_lb" "main" {
   internal                   = false
   load_balancer_type         = "application"
   security_groups            = [aws_security_group.ecs_sg.id]
-  subnets                    = [data.aws_subnet.public-subnet.id]
+  subnets                    = ["${var.subnet_id}","${var.subnet2_id}"]
   idle_timeout               = 30
   enable_deletion_protection = false
 }
@@ -237,7 +237,7 @@ resource "aws_lb_target_group" "ecs_rest_api_tg" {
   name     = "ecs-tg"
   port     = 5000
   protocol = "HTTP"
-  vpc_id   = data.aws_vpc.testvpc.id
+  vpc_id   = "${var.vpc_id}"
   health_check {
     path                = "/"
     protocol            = "HTTP"
@@ -298,7 +298,7 @@ resource "aws_launch_configuration" "ecs_launch_config" {
 # Create the ECS autoscaling group.
 resource "aws_autoscaling_group" "ecs_asg" {
   name                 = "ecs-asg"
-  vpc_zone_identifier  = [data.aws_subnet.private-subnet.id]
+  vpc_zone_identifier  = ["${var.subnet_id}"]
   launch_configuration = aws_launch_configuration.ecs_launch_config.name
 
   desired_capacity = var.desired_capacity

@@ -13,7 +13,7 @@ variable "maximum_capacity" {
 variable "instance_type" {
   description = "EC2 instance type for ECS launch configuration."
   type        = string
-  default     = "t2.micro"
+  default     = "m5.large"
 }
 
 variable "service_name" {
@@ -32,3 +32,4 @@ variable "vpc_id" {}
 
 variable "subnet_id" {}
 
+variable "subnet2_id" {}
