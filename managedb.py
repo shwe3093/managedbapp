@@ -38,7 +38,7 @@ def all_users():
         return render_template('users.html', list_users=list_users)
     except Exception as err:
         print(err)
-        return "Unable to query db"
+        return (err)
 
 @app.route("/")
 def index():
