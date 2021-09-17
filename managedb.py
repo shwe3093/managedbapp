@@ -36,7 +36,8 @@ def all_users():
         #print(list_users)
         #return jsonify(list_users)
         return render_template('users.html', list_users=list_users)
-    except:
+    except Exception as err:
+        print(err)
         return "Unable to query db"
 
 @app.route("/")
